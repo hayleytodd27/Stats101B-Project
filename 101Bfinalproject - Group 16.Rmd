@@ -1,0 +1,72 @@
+---
+title: "101Bfinalproject"
+author: "Group 16 - Gerard Agbangnin, Melissa Duffus, Moonseok Heo, Jaspreet Kang, Seungwoo Hong, Konner Macias, Breanna Ramos, Tyler Rodriguez, Hayley Todd"
+date: "6/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+memory <- read.csv("finalproject.csv",header = FALSE)
+colnames(memory) <- c("HouseNumber","Name","Gender","Age","Treatments","Before","After")
+attach(memory)
+
+#head(memory)
+memory
+```
+
+
+
+
+```{r}
+
+Difference <- memory$After - memory$Before
+memory$Difference <- Difference
+memory
+
+```
+
+
+
+```{r}
+# two factor factorial with one blocking
+
+caffeine <- rep(c(rep(1,4),rep(-1,4)),8) 
+exercise <- rep(c(rep(-1,4),rep(1,8),rep(-1,4)), 4)
+age <- c(rep(2,16),rep(3,16),rep(4,16),rep(5,16))
+
+
+memory_model <- aov(Difference ~ factor(caffeine)*factor(exercise)+factor(age)) 
+summary(memory_model) # Only exercise has a significant main effect(negative effect on memory game), there is no interaction effect. 
+```
+
+
+
+
+```{r}
+par(mfrow=c(1,2))
+plot(memory_model$residuals ~ memory_model$fitted.values) 
+qqnorm(memory_model$residuals)
+qqline(memory_model$residuals)
+
+```
+
+
+
+
+```{r}
+interaction.plot(caffeine, exercise, Difference)
+# There is no interaction effect between caffeine and exercise. As shown in the graph, caffeine has little effect 
+```
+```{r}
+library(phia)
+plotinter <- interactionMeans(memory_model)
+plot(plotinter)
+```
+
+
